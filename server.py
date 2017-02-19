@@ -18,7 +18,7 @@ def init():
         security.csrfProtect()
     config = api.getConfig()
     g.users = {}
-    for k, v in config["general_settings"]["users"].iteritems():
+    for k, v in list(config["general_settings"]["users"].items()):
         addUser = AuthUser(username=k)
         addUser.set_and_encrypt_password(v)
         g.users[k] = addUser
@@ -64,12 +64,12 @@ def retrieveValue(page, component):
     try:
         match = re.search("^(.+)\[(.+)\]$", component)
         if not match:
-            for k, v in config[page][component].iteritems():
+            for k, v in list(config[page][component].items()):
                 l = [None]
                 l.extend(strToList(v))
                 dict[k] = l
         else:
-            for sk, sv in config[page][match.group(1)][match.group(2)].iteritems():
+            for sk, sv in list(config[page][match.group(1)][match.group(2)].items()):
                 l = [match.group(2)]
                 l.extend(strToList(sv))
                 dict[sk] = l
@@ -117,7 +117,7 @@ def validateConfigFormat(config):
     requiredSettings = {"general_settings/server": ["url", "flask_url", "user", "password", "secret_key"],
                         "general_settings/domoboard": ["time", "date"],
                         "navbar/menu": [None] }
-    for sect, fields in requiredSettings.iteritems():
+    for sect, fields in list(requiredSettings.items()):
         section = sect.split('/')
         for field in fields:
             try:
@@ -164,7 +164,7 @@ if __name__ == '__main__':
 
     app.secret_key = config["general_settings"]["server"]["secret_key"]
     app.add_url_rule('/', 'index', index)
-    for k, v in config["navbar"]["menu"].iteritems():
+    for k, v in list(config["navbar"]["menu"].items()):
         v = strToList(v)
         app.add_url_rule('/' + v[0].lower(), v[0].lower(), generatePage, methods=['GET'])
     app.add_url_rule('/settings', 'settings', generatePage, methods=['GET'])
@@ -173,5 +173,5 @@ if __name__ == '__main__':
     app.add_url_rule('/api', 'api', api.gateway, methods=['POST'])
     try:
         app.run(host=flask_server_location.split(":")[0],port=int(flask_server_location.split(":")[1]), threaded=True, extra_files=watchfiles, debug=args.debug)
-    except socket.error, exc:
+    except socket.error as exc:
         sys.exit("Error when starting the Flask server: {}".format(exc))

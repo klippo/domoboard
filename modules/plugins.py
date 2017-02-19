@@ -2,7 +2,7 @@
 # This file contains the functions regarding the plugin manager.
 
 import git, shutil, os, imp, sys
-import security, api
+from . import security, api
 import re
 
 indexes = {}
@@ -62,8 +62,7 @@ def indexPlugins(params={}):
 
     if 'action' in params:
         if params['action'] == 'getPlugins':
-            folders = filter(lambda x: os.path.isdir(os.path.join(indexFolderPath, x)),
-                     os.listdir(indexFolderPath))
+            folders = [x for x in os.listdir(indexFolderPath) if os.path.isdir(os.path.join(indexFolderPath, x))]
             for i in folders:
                 i = security.sanitizePathBasename(i)
                 if i != '.git':
@@ -94,10 +93,10 @@ def indexPlugins(params={}):
                                 _text = re.sub('\n', '<br>', _text)
                             fol[_check] = _text
 
-                    if not i in (f['folder'] for f in indexes.itervalues()):
+                    if not i in (f['folder'] for f in indexes.values()):
                         indexes[len(indexes)] = fol
                     else:
-                        for tmp in indexes.itervalues():
+                        for tmp in indexes.values():
                             if i == tmp['folder']:
                                 for k in fol:
                                     if k != 'id':
@@ -153,9 +152,8 @@ def indexPlugins(params={}):
                 try:
                     git.Repo.clone_from("https://github.com/wez3/domoboard-plugins.git", indexFolderPath)
                 except:
-                    print 'indexed'
+                    print('indexed')
         else:
             git.cmd.Git(indexFolderPath).pull("https://github.com/wez3/domoboard-plugins.git")
-        folders = filter(lambda x: os.path.isdir(os.path.join(indexFolderPath, x)),
-                         os.listdir(indexFolderPath))
+        folders = [x for x in os.listdir(indexFolderPath) if os.path.isdir(os.path.join(indexFolderPath, x))]
         return indexPlugins({'action': 'getPlugins'})

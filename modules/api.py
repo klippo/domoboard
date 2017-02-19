@@ -4,7 +4,7 @@
 from flask import request
 from flaskext.auth import login_required
 import json, os, sys
-import security, charts, plugins, webconfig, domoticz
+from . import security, charts, plugins, webconfig, domoticz
 
 apiDict = {}
 modules = {}
@@ -69,6 +69,6 @@ def getOriginalConfig():
 def isJson(myjson):
     try:
         json_object = json.loads(str(myjson))
-    except ValueError, e:
+    except ValueError as e:
         return False
     return True

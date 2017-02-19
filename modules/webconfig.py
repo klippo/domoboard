@@ -2,7 +2,7 @@
 # This file contains the functions used for web based configuration of domoboard
 
 import git
-import api
+from . import api
 from flask import request
 
 def writeToConfig(idx, page, component, description, extra):
